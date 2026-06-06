@@ -28,7 +28,8 @@ It is also a great starting point for anyone looking to strengthen their SQL ski
 
 ---
 
-## Database Schema(music_store_db_query.txt)
+## Database Schema(<img width="2880" height="2982" alt="music_store_erd" src="https://github.com/user-attachments/assets/90365407-493c-4210-ada4-92dbe1b9f93b" />
+)
 
 The database consists of multiple related tables including `customer`, `invoice`, `invoice_line`, `track`, `album`, `artist`, `genre`, and `employee`.
 
