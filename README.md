@@ -32,7 +32,198 @@ It is also a great starting point for anyone looking to strengthen their SQL ski
 
 The database consists of multiple related tables including `customer`, `invoice`, `invoice_line`, `track`, `album`, `artist`, `genre`, and `employee`.
 
-![Schema Diagram](MusicDatabaseSchema.png)
+![Schema Diagram](<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Store – Database Schema</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f5f4f0;
+    color: #1a1a18;
+    padding: 2rem;
+    min-height: 100vh;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+  header h1 {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: #1a1a18;
+  }
+  header span {
+    font-size: 0.85rem;
+    color: #888780;
+    background: #e8e6df;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  #erd {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #d3d1c7;
+    padding: 1.5rem;
+    overflow: auto;
+  }
+  #erd svg { width: 100%; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #1e1e1c; color: #c2c0b6; }
+    header h1 { color: #e8e6df; }
+    header span { background: #2c2c2a; color: #888780; }
+    #erd { background: #252523; border-color: #3a3a37; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Music Store – Database Schema</h1>
+  <span>PostgreSQL · 11 tables</span>
+</header>
+<div id="erd"></div>
+
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '13px',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+    primaryColor: dark ? '#2d2b4e' : '#EEEDFE',
+    primaryBorderColor: dark ? '#534AB7' : '#7F77DD',
+    primaryTextColor: dark ? '#c2c0b6' : '#26215C',
+    secondaryColor: dark ? '#1a2e28' : '#E1F5EE',
+    tertiaryColor: dark ? '#2c1f1a' : '#FAECE7',
+  },
+});
+
+const diagram = `erDiagram
+  ARTIST ||--o{ ALBUM : "has"
+  ALBUM ||--o{ TRACK : "contains"
+  TRACK }o--|| MEDIATYPE : "is"
+  TRACK }o--|| GENRE : "belongs to"
+  TRACK ||--o{ INVOICELINE : "purchased via"
+  TRACK }o--o{ PLAYLISTTRACK : "listed in"
+  PLAYLIST ||--o{ PLAYLISTTRACK : "has"
+  INVOICE ||--o{ INVOICELINE : "has"
+  CUSTOMER ||--o{ INVOICE : "places"
+  EMPLOYEE ||--o{ CUSTOMER : "supports"
+  EMPLOYEE ||--o| EMPLOYEE : "reports to"
+
+  ARTIST {
+    int ArtistId PK
+    varchar Name
+  }
+  ALBUM {
+    int AlbumId PK
+    varchar Title
+    int ArtistId FK
+  }
+  TRACK {
+    int TrackId PK
+    varchar Name
+    int AlbumId FK
+    int MediaTypeId FK
+    int GenreId FK
+    varchar Composer
+    int Milliseconds
+    int Bytes
+    decimal UnitPrice
+  }
+  MEDIATYPE {
+    int MediaTypeId PK
+    varchar Name
+  }
+  GENRE {
+    int GenreId PK
+    varchar Name
+  }
+  PLAYLIST {
+    int PlaylistId PK
+    varchar Name
+  }
+  PLAYLISTTRACK {
+    int PlaylistId PK
+    int TrackId PK
+  }
+  INVOICELINE {
+    int InvoiceLineId PK
+    int InvoiceId FK
+    int TrackId FK
+    decimal UnitPrice
+    int Quantity
+  }
+  INVOICE {
+    int InvoiceId PK
+    int CustomerId FK
+    date InvoiceDate
+    varchar BillingAddress
+    varchar BillingCity
+    varchar BillingState
+    varchar BillingCountry
+    decimal Total
+  }
+  CUSTOMER {
+    int CustomerId PK
+    varchar FirstName
+    varchar LastName
+    varchar Company
+    varchar Email
+    int SupportRepId FK
+  }
+  EMPLOYEE {
+    int EmployeeId PK
+    varchar LastName
+    varchar FirstName
+    varchar Title
+    int ReportsTo FK
+    date HireDate
+    varchar Email
+  }
+`;
+
+const { svg } = await mermaid.render('erd-svg', diagram);
+document.getElementById('erd').innerHTML = svg;
+
+document.querySelectorAll('#erd svg .node').forEach(node => {
+  const firstPath = node.querySelector('path[d]');
+  if (!firstPath) return;
+  const d = firstPath.getAttribute('d');
+  const nums = d.match(/-?[\d.]+/g)?.map(Number);
+  if (!nums || nums.length < 8) return;
+  const xs = [nums[0], nums[2], nums[4], nums[6]];
+  const ys = [nums[1], nums[3], nums[5], nums[7]];
+  const x = Math.min(...xs), y = Math.min(...ys);
+  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', '8');
+  for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+    if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+  }
+  firstPath.replaceWith(rect);
+});
+
+document.querySelectorAll('#erd svg .row-rect-odd path, #erd svg .row-rect-even path').forEach(p => {
+  p.setAttribute('stroke', 'none');
+});
+</script>
+</body>
+</html>)
 
 ---
 
