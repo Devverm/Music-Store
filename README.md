@@ -28,7 +28,7 @@ It is also a great starting point for anyone looking to strengthen their SQL ski
 
 ---
 
-## Database Schema
+## Database Schema(music_store_db_query.txt)
 
 The database consists of multiple related tables including `customer`, `invoice`, `invoice_line`, `track`, `album`, `artist`, `genre`, and `employee`.
 
